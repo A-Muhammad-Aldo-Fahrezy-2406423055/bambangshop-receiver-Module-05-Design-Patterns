@@ -26,3 +26,9 @@ pub fn receive(payload: Json<Notification>) -> Result<Notification> {
         )),
     }
 }
+
+#[get("/")]
+pub fn list() -> Json<Vec<String>> {
+    let result = NotificationService::list_messages();
+    Json(result)
+}
