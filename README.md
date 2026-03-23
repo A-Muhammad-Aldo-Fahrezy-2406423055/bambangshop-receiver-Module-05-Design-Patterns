@@ -59,25 +59,25 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   Open another new terminal, edit `ROCKET_PORT` in `.env` to `8003`, then execute `cargo run`.
 
 ## Mandatory Checklists (Subscriber)
--   [ ] Clone https://gitlab.com/ichlaffterlalu/bambangshop-receiver to a new repository.
+-   [x] Clone https://gitlab.com/ichlaffterlalu/bambangshop-receiver to a new repository.
 -   **STAGE 1: Implement models and repositories**
-    -   [ ] Commit: `Create Notification model struct.`
-    -   [ ] Commit: `Create SubscriberRequest model struct.`
-    -   [ ] Commit: `Create Notification database and Notification repository struct skeleton.`
-    -   [ ] Commit: `Implement add function in Notification repository.`
-    -   [ ] Commit: `Implement list_all_as_string function in Notification repository.`
-    -   [ ] Write answers of your learning module's "Reflection Subscriber-1" questions in this README.
+    -   [x] Commit: `Create Notification model struct.`
+    -   [x] Commit: `Create SubscriberRequest model struct.`
+    -   [x] Commit: `Create Notification database and Notification repository struct skeleton.`
+    -   [x] Commit: `Implement add function in Notification repository.`
+    -   [x] Commit: `Implement list_all_as_string function in Notification repository.`
+    -   [x] Write answers of your learning module's "Reflection Subscriber-1" questions in this README.
 -   **STAGE 3: Implement services and controllers**
-    -   [ ] Commit: `Create Notification service struct skeleton.`
-    -   [ ] Commit: `Implement subscribe function in Notification service.`
-    -   [ ] Commit: `Implement subscribe function in Notification controller.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification service.`
-    -   [ ] Commit: `Implement unsubscribe function in Notification controller.`
-    -   [ ] Commit: `Implement receive_notification function in Notification service.`
-    -   [ ] Commit: `Implement receive function in Notification controller.`
-    -   [ ] Commit: `Implement list_messages function in Notification service.`
-    -   [ ] Commit: `Implement list function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
+    -   [x] Commit: `Create Notification service struct skeleton.`
+    -   [x] Commit: `Implement subscribe function in Notification service.`
+    -   [x] Commit: `Implement subscribe function in Notification controller.`
+    -   [x] Commit: `Implement unsubscribe function in Notification service.`
+    -   [x] Commit: `Implement unsubscribe function in Notification controller.`
+    -   [x] Commit: `Implement receive_notification function in Notification service.`
+    -   [x] Commit: `Implement receive function in Notification controller.`
+    -   [x] Commit: `Implement list_messages function in Notification service.`
+    -   [x] Commit: `Implement list function in Notification controller.`
+    -   [x] Write answers of your learning module's "Reflection Subscriber-2" questions in this README.
 
 ## Your Reflections
 This is the place for you to write reflections:
@@ -85,5 +85,13 @@ This is the place for you to write reflections:
 ### Mandatory (Subscriber) Reflections
 
 #### Reflection Subscriber-1
+RwLock (Read-Write Lock) allows multiple readers simultaneously but only one writer at a time, whereas Mutex only allows one thread to access the inner value at a time regardless of whether it's reading or writing. Since notifications are read frequently (e.g., listing all notifications) but written only when a new notification arrives, RwLock provides much better performance and concurrency for this use case.
+
+Rust prioritizes memory safety and preventing data races at compile-time. Allowing arbitrary mutation of global static variables (like in Java) inherently introduces a high risk of undefined behavior and data races in multi-threaded environments. Therefore, Rust enforces the use of safe wrappers like lazy_static alongside synchronization primitives such as RwLock or Mutex, or atomic types, to ensure global state mutation is explicitly thread-safe.
 
 #### Reflection Subscriber-2
+I have explored parts of the code outside the tutorial steps, such as `src/lib.rs` and the `APP_CONFIG` implementation. By observing these files, I learned how the Rocket framework initializes its state and manages global configuration across the Application. Exploring the `lib.rs` file showed me how the application mounts routes to the web server, handles CORS, and exposes core functionalities to `main.rs`, giving me a deeper understanding of how the whole Rust project is structured and bootstrapped cleanly.
+
+Using the Observer pattern completely decouples the Main app (Publisher) from its Receiver apps (Subscribers). Since the publisher only interfaces with a generic "Subscriber" URL and sends standardized data payloads, plugging in new subscribers is completely effortless; we simply start another instance and tell it to subscribe to the Publisher's URL. However, spawning more than one instance of the Main app would pose a challenge in the current setup. Since the list of subscribers is stored in the local memory of a specific Main app instance using a Singleton/DashMap, a second Main app instance wouldn't know about the subscribers connected to the first one. To solve this, the system would need a shared external database or a message broker like RabbitMQ or Redis Pub/Sub to coordinate the state across multiple publishers.
+
+I have explored using Postman's automated testing feature and found it incredibly useful for verifying API contracts. Writing test scripts directly in the Postman collection ensures that the payloads being sent and received match our expected schema. It saves me from manually clicking through requests and visually inspecting JSON responses. For a Group Project, having these automated tests is a major advantage because it ensures any breaking changes to the data formats are caught immediately during continuous integration, minimizing the risk of integration issues between microservices.
