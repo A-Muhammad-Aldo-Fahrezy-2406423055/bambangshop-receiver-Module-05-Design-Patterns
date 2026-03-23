@@ -54,4 +54,14 @@ impl NotificationService {
             Self::unsubscribe_request(&pt).await;
         });
     }
+
+    pub fn receive_notification(payload: Notification) -> Result<Notification, &'static str> {
+        let subscriber_name = APP_CONFIG.get_instance_name();
+        if payload.subscriber_name != *subscriber_name {
+            return Err("Subscriber name mismatch");
+        }
+        
+        let notification = NotificationRepository::add(payload);
+        return Ok(notification);
+    }
 }
