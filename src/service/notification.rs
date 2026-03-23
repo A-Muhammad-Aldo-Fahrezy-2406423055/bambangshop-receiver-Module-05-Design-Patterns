@@ -33,4 +33,25 @@ impl NotificationService {
             Self::subscribe_request(&pt).await;
         });
     }
+
+    async fn unsubscribe_request(product_type: &str) {
+        let publisher_url = APP_CONFIG.get_publisher_root_url();
+        let target_url = format!("{}/notification/unsubscribe/{}?url={}/receive", 
+            publisher_url, 
+            product_type,
+            APP_CONFIG.get_instance_root_url()
+        );
+
+        match REQWEST_CLIENT.post(&target_url).send().await {
+            Ok(res) => println!("Successfully unsubscribed from {}: {}", product_type, res.status()),
+            Err(e) => println!("Failed to unsubscribe from {}: {}", product_type, e),
+        }
+    }
+
+    pub fn unsubscribe(product_type: &str) {
+        let pt = String::from(product_type);
+        tokio::spawn(async move {
+            Self::unsubscribe_request(&pt).await;
+        });
+    }
 }
